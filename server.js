@@ -27,4 +27,9 @@ app.get("/docs", (req, res) => {
   res.sendFile(docsPath);
 });
 
+app.get("/", (req, res) => {
+  const docsPath = path.join(process.cwd(), "docs.html");
+  res.sendFile(docsPath);
+});
+
 app.listen(8080, () => console.log("Image Optimization Node running on port 8080"));
