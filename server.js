@@ -13,6 +13,9 @@ const app = express();
 
 app.use(express.json());
 
+// Respect X-Forwarded-* headers when behind a proxy/ingress
+app.set("trust proxy", true);
+
 app.use("/optimized", express.static("optimized"));
 
 // Use routes
