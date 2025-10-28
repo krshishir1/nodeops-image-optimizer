@@ -2,9 +2,6 @@ import express from "express";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
-import { optimizeImage } from "./utils/optimize.js";
-import axios from "axios";
-import mime from "mime";
 
 // Import routes
 import compressRoutes from "./routes/compress.js";
@@ -13,7 +10,6 @@ import resizeRoutes from "./routes/resize.js";
 import watermarkRoutes from "./routes/watermark.js";
 
 const app = express();
-const upload = multer({ dest: "uploads/" });
 
 app.use(express.json());
 
@@ -25,91 +21,10 @@ app.use("/convert", convertRoutes);
 app.use("/resize", resizeRoutes);
 app.use("/watermark", watermarkRoutes);
 
-// 🟢 Optimize via Upload (legacy endpoint)
-app.post("/optimize", upload.single("image"), async (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ error: "No file uploaded" });
-    }
-
-    console.log(req.file);
-    const filePath = req.file.path;
-
-    // Validate that the uploaded file is an image
-    // Use req.file.mimetype which multer provides, or fallback to originalname
-    const mimeType = req.file.mimetype || mime.getType(req.file.originalname);
-    const validImageTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/gif"];
-
-    console.log("File received: ", filePath, mimeType);
-
-    
-    if (!mimeType || !validImageTypes.includes(mimeType)) {
-      // Clean up uploaded file
-      fs.unlinkSync(filePath);
-      return res.status(400).json({ error: "Invalid file type. Only images (JPEG, PNG, WebP, GIF) are allowed." });
-    }
-
-    const optimizedPath = await optimizeImage(filePath, mimeType, req.file.originalname);
-    
-    const outputMimeType = mime.getType(optimizedPath);
-    console.log("Output path: ", optimizedPath, outputMimeType);
-
-    // Clean up the uploaded temporary file
-    fs.unlinkSync(filePath);
-
-    // Get full URL including base
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
-    res.json({ 
-      url: `/optimized/${path.basename(optimizedPath)}`,
-      fullUrl: `${baseUrl}/optimized/${path.basename(optimizedPath)}`
-    });
-
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Image optimization failed" });
-  }
-});
-
-// 🟣 Optimize via URL
-app.post("/optimize-url", async (req, res) => {
-  try {
-    const { imageUrl } = req.body;
-    
-    if (!imageUrl) {
-      return res.status(400).json({ error: "No image URL provided" });
-    }
-
-    const response = await axios.get(imageUrl, { responseType: "arraybuffer" });
-    
-    // Get mime type from response headers
-    const mimeType = response.headers['content-type']?.split(';')[0]?.trim();
-    const validImageTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/gif"];
-    
-    if (!mimeType || !validImageTypes.includes(mimeType)) {
-      return res.status(400).json({ error: "Invalid file type. Only images (JPEG, PNG, WebP, GIF) are allowed." });
-    }
-    
-    const ext = mime.getExtension(mimeType) || "jpg";
-    const tempPath = `uploads/${Date.now()}.${ext}`;
-    fs.writeFileSync(tempPath, response.data);
-    
-    const optimizedPath = await optimizeImage(tempPath, mimeType);
-    
-    // Clean up the temporary downloaded file
-    fs.unlinkSync(tempPath);
-    
-    // Get full URL including base
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
-    
-    // Return the static URL
-    res.json({ 
-      url: `/optimized/${path.basename(optimizedPath)}`,
-      fullUrl: `${baseUrl}/optimized/${path.basename(optimizedPath)}`
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Optimization failed" });
-  }
+// Documentation endpoint
+app.get("/docs", (req, res) => {
+  const docsPath = path.join(process.cwd(), "docs.html");
+  res.sendFile(docsPath);
 });
 
 app.listen(8080, () => console.log("Image Optimization Node running on port 8080"));

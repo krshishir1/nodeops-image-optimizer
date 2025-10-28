@@ -1,66 +1,50 @@
 # Image Optimization API
 
-A comprehensive image processing API with multiple features including compression, format conversion, resizing, and watermarking.
+A comprehensive image processing API built with Node.js and Sharp that provides powerful image optimization features including compression, format conversion, resizing, and watermarking capabilities.
 
-## Features
+## Project Description
 
-- **Compression**: Reduce file size while preserving quality
-- **Format Conversion**: Convert to WebP/AVIF formats
-- **Resizing/Cropping**: Generate thumbnails and resize images
-- **Watermarking**: Add text or image watermarks
-- **Basic Optimization**: Original optimization functionality
+This API offers a complete suite of image processing tools designed for modern web applications. It supports both file upload and URL-based processing, making it flexible for various use cases. The API is built with performance in mind, using Sharp for high-quality image processing and Express.js for a clean RESTful interface.
+
+## Tech Stack
+
+- **Node.js** - Runtime environment
+- **Express.js** - Web framework
+- **Sharp** - High-performance image processing
+- **Multer** - File upload handling
+- **Axios** - HTTP client for URL processing
+- **MIME** - File type detection
 
 ## API Endpoints
 
-### 1. Compression
-**POST** `/compress`
-- Compress image with quality control
-- Body: `image` (file), `quality` (number, 1-100, default: 80)
-- Response: `{ url: "/optimized/filename-compressed.jpg", fullUrl: "http://localhost:8080/optimized/filename-compressed.jpg" }`
+### Compression
+- `POST /compress` - Compress image with quality control
+- `POST /compress/url` - Compress image from URL
 
-### 2. Format Conversion
-**POST** `/convert/webp`
-- Convert image to WebP format
-- Body: `image` (file), `quality` (number, 1-100, default: 80)
-- Response: `{ url: "/optimized/filename-webp.webp", fullUrl: "http://localhost:8080/optimized/filename-webp.webp" }`
+### Format Conversion
+- `POST /convert/webp` - Convert image to WebP format
+- `POST /convert/webp/url` - Convert image to WebP from URL
+- `POST /convert/avif` - Convert image to AVIF format
+- `POST /convert/avif/url` - Convert image to AVIF from URL
 
-**POST** `/convert/avif`
-- Convert image to AVIF format
-- Body: `image` (file), `quality` (number, 1-100, default: 80)
-- Response: `{ url: "/optimized/filename-avif.avif", fullUrl: "http://localhost:8080/optimized/filename-avif.avif" }`
+### Resizing
+- `POST /resize` - Resize image with custom dimensions
+- `POST /resize/url` - Resize image from URL
+- `POST /resize/thumbnail` - Generate square thumbnail
+- `POST /resize/thumbnail/url` - Generate thumbnail from URL
 
-### 3. Resizing
-**POST** `/resize`
-- Resize image with custom dimensions
-- Body: `image` (file), `width` (number), `height` (number, optional), `fit` (string: cover|contain|fill|inside|outside, default: cover)
-- Response: `{ url: "/optimized/filename-resized.jpg", fullUrl: "http://localhost:8080/optimized/filename-resized.jpg" }`
+### Watermarking
+- `POST /watermark/text` - Add text watermark
+- `POST /watermark/text/url` - Add text watermark from URL
+- `POST /watermark/image` - Add image watermark
+- `POST /watermark/image/url` - Add image watermark from URL
 
-**POST** `/resize/thumbnail`
-- Generate square thumbnail
-- Body: `image` (file), `size` (number, default: 150)
-- Response: `{ url: "/optimized/filename-thumbnail.jpg", fullUrl: "http://localhost:8080/optimized/filename-thumbnail.jpg" }`
+### Legacy Endpoints
+- `POST /optimize` - Basic image optimization
+- `POST /optimize-url` - Optimize image from URL
 
-### 4. Watermarking
-**POST** `/watermark/text`
-- Add text watermark
-- Body: `image` (file), `text` (string), `fontSize` (number, default: 24), `color` (string, default: 'white'), `opacity` (number, 0-1, default: 0.7), `position` (string: top-left|top-right|bottom-left|bottom-right|center, default: 'bottom-right'), `margin` (number, default: 20)
-- Response: `{ url: "/optimized/filename-watermark.jpg", fullUrl: "http://localhost:8080/optimized/filename-watermark.jpg" }`
-
-**POST** `/watermark/image`
-- Add image watermark
-- Body: `image` (file), `watermark` (file), `opacity` (number, 0-1, default: 0.7), `position` (string, default: 'bottom-right'), `margin` (number, default: 20), `scale` (number, 0-1, default: 0.2)
-- Response: `{ url: "/optimized/filename-watermark.jpg", fullUrl: "http://localhost:8080/optimized/filename-watermark.jpg" }`
-
-### 5. Legacy Endpoints
-**POST** `/optimize`
-- Basic image optimization (legacy)
-- Body: `image` (file)
-- Response: `{ url: "/optimized/filename.jpg", fullUrl: "http://localhost:8080/optimized/filename.jpg" }`
-
-**POST** `/optimize-url`
-- Optimize image from URL (legacy)
-- Body: `{ imageUrl: "https://example.com/image.jpg" }`
-- Response: `{ url: "/optimized/filename.jpg", fullUrl: "http://localhost:8080/optimized/filename.jpg" }`
+### Documentation
+- `GET /docs` - Interactive API documentation
 
 ## File Naming Convention
 
@@ -90,3 +74,7 @@ docker-compose up
 ```
 
 Server runs on port 8080.
+
+## Documentation
+
+Visit `http://localhost:8080/docs` for interactive API documentation with examples and detailed parameter descriptions.

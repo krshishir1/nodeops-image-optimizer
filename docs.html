@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Optimization API Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+            margin-bottom: 40px;
+            border-radius: 10px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .section {
+            background: white;
+            padding: 30px;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        h3 {
+            color: #555;
+            margin: 25px 0 15px 0;
+            font-size: 1.3rem;
+        }
+        
+        .endpoint {
+            background: #f8f9fa;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .method {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin-right: 10px;
+        }
+        
+        .post {
+            background: #28a745;
+            color: white;
+        }
+        
+        .path {
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 1.1rem;
+            color: #333;
+        }
+        
+        .description {
+            margin-top: 10px;
+            color: #666;
+        }
+        
+        .params {
+            margin-top: 15px;
+        }
+        
+        .param {
+            margin: 8px 0;
+            padding-left: 20px;
+        }
+        
+        .param-name {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .param-type {
+            color: #666;
+            font-style: italic;
+        }
+        
+        .example {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+        
+        .example pre {
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9rem;
+        }
+        
+        .response {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #28a745;
+        }
+        
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .tech-item {
+            background: #667eea;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #666;
+            border-top: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Image Optimization API</h1>
+            <p class="subtitle">Comprehensive image processing with compression, conversion, resizing, and watermarking</p>
+        </header>
+
+        <div class="section">
+            <h2>About</h2>
+            <p>A powerful image processing API built with Node.js and Sharp that provides comprehensive image optimization features including compression, format conversion, resizing, and watermarking capabilities.</p>
+            
+            <h3>Tech Stack</h3>
+            <div class="tech-stack">
+                <span class="tech-item">Node.js</span>
+                <span class="tech-item">Express.js</span>
+                <span class="tech-item">Sharp</span>
+                <span class="tech-item">Multer</span>
+                <span class="tech-item">Axios</span>
+                <span class="tech-item">MIME</span>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>API Endpoints</h2>
+            
+            <h3>Compression</h3>
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span class="path">/compress</span>
+                <div class="description">Compress image with quality control</div>
+                <div class="params">
+                    <div class="param"><span class="param-name">image</span> <span class="param-type">(file)</span> - Image file to compress</div>
+                    <div class="param"><span class="param-name">quality</span> <span class="param-type">(number)</span> - Quality 1-100, default: 100</div>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span class="path">/compress/url</span>
+                <div class="description">Compress image from URL</div>
+                <div class="params">
+                    <div class="param"><span class="param-name">imageUrl</span> <span class="param-type">(string)</span> - URL of image to compress</div>
+                    <div class="param"><span class="param-name">quality</span> <span class="param-type">(number)</span> - Quality 1-100, default: 100</div>
+                </div>
+            </div>
+
+            <h3>Format Conversion</h3>
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span class="path">/convert/webp</span>
+                <div class="description">Convert image to WebP format</div>
+                <div class="params">
+                    <div class="param"><span class="param-name">image</span> <span class="param-type">(file)</span> - Image file to convert</div>
+                    <div class="param"><span class="param-name">quality</span> <span class="param-type">(number)</span> - Quality 1-100, default: 80</div>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span class="path">/convert/webp/url</span>
+                <div class="description">Convert image to WebP from URL</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span class="path">/convert/avif</span>
+                <div class="description">Convert image to AVIF format</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span class="path">/convert/avif/url</span>
+                <div class="description">Convert image to AVIF from URL</div>
+            </div>
+
+            <h3>Resizing</h3>
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span class="path">/resize</span>
+                <div class="description">Resize image with custom dimensions</div>
+                <div class="params">
+                    <div class="param"><span class="param-name">image</span> <span class="param-type">(file)</span> - Image file to resize</div>
+                    <div class="param"><span class="param-name">width</span> <span class="param-type">(number)</span> - Target width (required)</div>
+                    <div class="param"><span class="param-name">height</span> <span class="param-type">(number)</span> - Target height (optional)</div>
+                    <div class="param"><span class="param-name">fit</span> <span class="param-type">(string)</span> - Fit mode: cover|contain|fill|inside|outside</div>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span class="path">/resize/url</span>
+                <div class="description">Resize image from URL</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span class="path">/resize/thumbnail</span>
+                <div class="description">Generate square thumbnail</div>
+                <div class="params">
+                    <div class="param"><span class="param-name">image</span> <span class="param-type">(file)</span> - Image file</div>
+                    <div class="param"><span class="param-name">size</span> <span class="param-type">(number)</span> - Thumbnail size, default: 150</div>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span class="path">/resize/thumbnail/url</span>
+                <div class="description">Generate thumbnail from URL</div>
+            </div>
+
+            <h3>Watermarking</h3>
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span class="path">/watermark/text</span>
+                <div class="description">Add text watermark</div>
+                <div class="params">
+                    <div class="param"><span class="param-name">image</span> <span class="param-type">(file)</span> - Image file</div>
+                    <div class="param"><span class="param-name">text</span> <span class="param-type">(string)</span> - Watermark text (required)</div>
+                    <div class="param"><span class="param-name">fontSize</span> <span class="param-type">(number)</span> - Font size, default: 24</div>
+                    <div class="param"><span class="param-name">color</span> <span class="param-type">(string)</span> - Text color, default: white</div>
+                    <div class="param"><span class="param-name">opacity</span> <span class="param-type">(number)</span> - Opacity 0-1, default: 0.7</div>
+                    <div class="param"><span class="param-name">position</span> <span class="param-type">(string)</span> - Position: top-left|top-right|bottom-left|bottom-right|center</div>
+                    <div class="param"><span class="param-name">margin</span> <span class="param-type">(number)</span> - Margin from edge, default: 20</div>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span class="path">/watermark/text/url</span>
+                <div class="description">Add text watermark from URL</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span class="path">/watermark/image</span>
+                <div class="description">Add image watermark</div>
+                <div class="params">
+                    <div class="param"><span class="param-name">image</span> <span class="param-type">(file)</span> - Main image file</div>
+                    <div class="param"><span class="param-name">watermark</span> <span class="param-type">(file)</span> - Watermark image file</div>
+                    <div class="param"><span class="param-name">opacity</span> <span class="param-type">(number)</span> - Opacity 0-1, default: 0.7</div>
+                    <div class="param"><span class="param-name">position</span> <span class="param-type">(string)</span> - Position, default: bottom-right</div>
+                    <div class="param"><span class="param-name">margin</span> <span class="param-type">(number)</span> - Margin from edge, default: 20</div>
+                    <div class="param"><span class="param-name">scale</span> <span class="param-type">(number)</span> - Watermark scale 0-1, default: 0.2</div>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span class="path">/watermark/image/url</span>
+                <div class="description">Add image watermark from URL</div>
+            </div>
+
+            <h3>Legacy Endpoints</h3>
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span class="path">/optimize</span>
+                <div class="description">Basic image optimization (legacy)</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span class="path">/optimize-url</span>
+                <div class="description">Optimize image from URL (legacy)</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Response Format</h2>
+            <p>All endpoints return a consistent JSON response:</p>
+            <div class="response">
+                <pre>{
+  "url": "/optimized/filename-action.extension",
+  "fullUrl": "http://localhost:8080/optimized/filename-action.extension"
+}</pre>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>File Naming Convention</h2>
+            <p>Processed images follow the pattern: <code>filename-{action}.{extension}</code></p>
+            <div class="example">
+                <pre>filename-compressed.jpg
+filename-webp.webp
+filename-resized.jpg
+filename-thumbnail.jpg
+filename-watermark.jpg</pre>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Supported Formats</h2>
+            <div class="params">
+                <div class="param"><span class="param-name">Input:</span> JPEG, PNG, WebP, GIF</div>
+                <div class="param"><span class="param-name">Output:</span> JPEG, PNG, WebP, AVIF (depending on endpoint)</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Example Usage</h2>
+            <div class="example">
+                <pre># Compress image
+curl -X POST http://localhost:8080/compress \
+  -F "image=@photo.jpg" \
+  -F "quality=80"
+
+# Convert to WebP from URL
+curl -X POST http://localhost:8080/convert/webp/url \
+  -H "Content-Type: application/json" \
+  -d '{"imageUrl": "https://example.com/image.jpg", "quality": 80}'
+
+# Resize image
+curl -X POST http://localhost:8080/resize \
+  -F "image=@photo.jpg" \
+  -F "width=800" \
+  -F "height=600"
+
+# Add text watermark
+curl -X POST http://localhost:8080/watermark/text \
+  -F "image=@photo.jpg" \
+  -F "text=Copyright 2024" \
+  -F "position=bottom-right"</pre>
+            </div>
+        </div>
+
+        <footer>
+            <p>Image Optimization API - Built with Node.js and Sharp</p>
+        </footer>
+    </div>
+</body>
+</html>
