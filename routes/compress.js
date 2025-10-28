@@ -2,62 +2,34 @@ import express from "express";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
-import { optimizeImage } from "./utils/optimize.js";
-import axios from "axios";
 import mime from "mime";
+import axios from "axios";
+import { compressImage } from "../utils/compression.js";
 
-// Import routes
-import compressRoutes from "./routes/compress.js";
-import convertRoutes from "./routes/convert.js";
-import resizeRoutes from "./routes/resize.js";
-import watermarkRoutes from "./routes/watermark.js";
-
-const app = express();
+const router = express.Router();
 const upload = multer({ dest: "uploads/" });
 
-app.use(express.json());
-
-app.use("/optimized", express.static("optimized"));
-
-// Use routes
-app.use("/compress", compressRoutes);
-app.use("/convert", convertRoutes);
-app.use("/resize", resizeRoutes);
-app.use("/watermark", watermarkRoutes);
-
-// 🟢 Optimize via Upload (legacy endpoint)
-app.post("/optimize", upload.single("image"), async (req, res) => {
+// POST /compress - Compress image with quality control
+router.post("/", upload.single("image"), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: "No file uploaded" });
     }
 
-    console.log(req.file);
     const filePath = req.file.path;
-
-    // Validate that the uploaded file is an image
-    // Use req.file.mimetype which multer provides, or fallback to originalname
     const mimeType = req.file.mimetype || mime.getType(req.file.originalname);
     const validImageTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/gif"];
-
-    console.log("File received: ", filePath, mimeType);
-
     
     if (!mimeType || !validImageTypes.includes(mimeType)) {
-      // Clean up uploaded file
       fs.unlinkSync(filePath);
       return res.status(400).json({ error: "Invalid file type. Only images (JPEG, PNG, WebP, GIF) are allowed." });
     }
 
-    const optimizedPath = await optimizeImage(filePath, mimeType, req.file.originalname);
+    const quality = parseInt(req.body.quality) || 80;
+    const optimizedPath = await compressImage(filePath, mimeType, req.file.originalname, quality);
     
-    const outputMimeType = mime.getType(optimizedPath);
-    console.log("Output path: ", optimizedPath, outputMimeType);
-
-    // Clean up the uploaded temporary file
     fs.unlinkSync(filePath);
 
-    // Get full URL including base
     const baseUrl = `${req.protocol}://${req.get('host')}`;
     res.json({ 
       url: `/optimized/${path.basename(optimizedPath)}`,
@@ -66,14 +38,14 @@ app.post("/optimize", upload.single("image"), async (req, res) => {
 
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Image optimization failed" });
+    res.status(500).json({ error: "Image compression failed" });
   }
 });
 
-// 🟣 Optimize via URL
-app.post("/optimize-url", async (req, res) => {
+// POST /compress/url - Compress image from URL
+router.post("/url", async (req, res) => {
   try {
-    const { imageUrl } = req.body;
+    const { imageUrl, quality = 100 } = req.body;
     
     if (!imageUrl) {
       return res.status(400).json({ error: "No image URL provided" });
@@ -93,7 +65,21 @@ app.post("/optimize-url", async (req, res) => {
     const tempPath = `uploads/${Date.now()}.${ext}`;
     fs.writeFileSync(tempPath, response.data);
     
-    const optimizedPath = await optimizeImage(tempPath, mimeType);
+    // Extract filename from URL or generate random name
+    let filename;
+    try {
+      const urlPath = new URL(imageUrl).pathname;
+      const urlFilename = path.basename(urlPath);
+      if (urlFilename && urlFilename.includes('.')) {
+        filename = urlFilename;
+      } else {
+        filename = `image-${Date.now()}.${ext}`;
+      }
+    } catch (error) {
+      filename = `image-${Date.now()}.${ext}`;
+    }
+    
+    const optimizedPath = await compressImage(tempPath, mimeType, filename, parseInt(quality));
     
     // Clean up the temporary downloaded file
     fs.unlinkSync(tempPath);
@@ -108,8 +94,8 @@ app.post("/optimize-url", async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Optimization failed" });
+    res.status(500).json({ error: "Image compression from URL failed" });
   }
 });
 
-app.listen(8080, () => console.log("Image Optimization Node running on port 8080"));
+export default router;

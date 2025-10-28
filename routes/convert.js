@@ -1,0 +1,190 @@
+import express from "express";
+import multer from "multer";
+import path from "path";
+import fs from "fs";
+import mime from "mime";
+import axios from "axios";
+import { convertToWebP, convertToAVIF } from "../utils/formatConversion.js";
+
+const router = express.Router();
+const upload = multer({ dest: "uploads/" });
+
+// POST /convert/webp - Convert to WebP
+router.post("/webp", upload.single("image"), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: "No file uploaded" });
+    }
+
+    const filePath = req.file.path;
+    const mimeType = req.file.mimetype || mime.getType(req.file.originalname);
+    const validImageTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/gif"];
+    
+    if (!mimeType || !validImageTypes.includes(mimeType)) {
+      fs.unlinkSync(filePath);
+      return res.status(400).json({ error: "Invalid file type. Only images (JPEG, PNG, WebP, GIF) are allowed." });
+    }
+
+    const quality = parseInt(req.body.quality) || 80;
+    const optimizedPath = await convertToWebP(filePath, req.file.originalname, quality);
+    
+    fs.unlinkSync(filePath);
+
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    res.json({ 
+      url: `/optimized/${path.basename(optimizedPath)}`,
+      fullUrl: `${baseUrl}/optimized/${path.basename(optimizedPath)}`
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "WebP conversion failed" });
+  }
+});
+
+// POST /convert/avif - Convert to AVIF
+router.post("/avif", upload.single("image"), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: "No file uploaded" });
+    }
+
+    const filePath = req.file.path;
+    const mimeType = req.file.mimetype || mime.getType(req.file.originalname);
+    const validImageTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/gif"];
+    
+    if (!mimeType || !validImageTypes.includes(mimeType)) {
+      fs.unlinkSync(filePath);
+      return res.status(400).json({ error: "Invalid file type. Only images (JPEG, PNG, WebP, GIF) are allowed." });
+    }
+
+    const quality = parseInt(req.body.quality) || 80;
+    const optimizedPath = await convertToAVIF(filePath, req.file.originalname, quality);
+    
+    fs.unlinkSync(filePath);
+
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    res.json({ 
+      url: `/optimized/${path.basename(optimizedPath)}`,
+      fullUrl: `${baseUrl}/optimized/${path.basename(optimizedPath)}`
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "AVIF conversion failed" });
+  }
+});
+
+// POST /convert/webp/url - Convert to WebP from URL
+router.post("/webp/url", async (req, res) => {
+  try {
+    const { imageUrl, quality = 80 } = req.body;
+    
+    if (!imageUrl) {
+      return res.status(400).json({ error: "No image URL provided" });
+    }
+
+    const response = await axios.get(imageUrl, { responseType: "arraybuffer" });
+    
+    // Get mime type from response headers
+    const mimeType = response.headers['content-type']?.split(';')[0]?.trim();
+    const validImageTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/gif"];
+    
+    if (!mimeType || !validImageTypes.includes(mimeType)) {
+      return res.status(400).json({ error: "Invalid file type. Only images (JPEG, PNG, WebP, GIF) are allowed." });
+    }
+    
+    const ext = mime.getExtension(mimeType) || "jpg";
+    const tempPath = `uploads/${Date.now()}.${ext}`;
+    fs.writeFileSync(tempPath, response.data);
+    
+    // Extract filename from URL or generate random name
+    let filename;
+    try {
+      const urlPath = new URL(imageUrl).pathname;
+      const urlFilename = path.basename(urlPath);
+      if (urlFilename && urlFilename.includes('.')) {
+        filename = urlFilename;
+      } else {
+        filename = `image-${Date.now()}.${ext}`;
+      }
+    } catch (error) {
+      filename = `image-${Date.now()}.${ext}`;
+    }
+    
+    const optimizedPath = await convertToWebP(tempPath, filename, parseInt(quality));
+    
+    // Clean up the temporary downloaded file
+    fs.unlinkSync(tempPath);
+    
+    // Get full URL including base
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    
+    // Return the static URL
+    res.json({ 
+      url: `/optimized/${path.basename(optimizedPath)}`,
+      fullUrl: `${baseUrl}/optimized/${path.basename(optimizedPath)}`
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "WebP conversion from URL failed" });
+  }
+});
+
+// POST /convert/avif/url - Convert to AVIF from URL
+router.post("/avif/url", async (req, res) => {
+  try {
+    const { imageUrl, quality = 80 } = req.body;
+    
+    if (!imageUrl) {
+      return res.status(400).json({ error: "No image URL provided" });
+    }
+
+    const response = await axios.get(imageUrl, { responseType: "arraybuffer" });
+    
+    // Get mime type from response headers
+    const mimeType = response.headers['content-type']?.split(';')[0]?.trim();
+    const validImageTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/gif"];
+    
+    if (!mimeType || !validImageTypes.includes(mimeType)) {
+      return res.status(400).json({ error: "Invalid file type. Only images (JPEG, PNG, WebP, GIF) are allowed." });
+    }
+    
+    const ext = mime.getExtension(mimeType) || "jpg";
+    const tempPath = `uploads/${Date.now()}.${ext}`;
+    fs.writeFileSync(tempPath, response.data);
+    
+    // Extract filename from URL or generate random name
+    let filename;
+    try {
+      const urlPath = new URL(imageUrl).pathname;
+      const urlFilename = path.basename(urlPath);
+      if (urlFilename && urlFilename.includes('.')) {
+        filename = urlFilename;
+      } else {
+        filename = `image-${Date.now()}.${ext}`;
+      }
+    } catch (error) {
+      filename = `image-${Date.now()}.${ext}`;
+    }
+    
+    const optimizedPath = await convertToAVIF(tempPath, filename, parseInt(quality));
+    
+    // Clean up the temporary downloaded file
+    fs.unlinkSync(tempPath);
+    
+    // Get full URL including base
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    
+    // Return the static URL
+    res.json({ 
+      url: `/optimized/${path.basename(optimizedPath)}`,
+      fullUrl: `${baseUrl}/optimized/${path.basename(optimizedPath)}`
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "AVIF conversion from URL failed" });
+  }
+});
+
+export default router;
