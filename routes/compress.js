@@ -5,6 +5,7 @@ import fs from "fs";
 import mime from "mime";
 import axios from "axios";
 import { compressImage } from "../utils/compression.js";
+import { addFileToIPFS } from "../utils/ipfs.js";
 
 const router = express.Router();
 const upload = multer({ dest: "uploads/" });
@@ -27,13 +28,23 @@ router.post("/", upload.single("image"), async (req, res) => {
 
     const quality = parseInt(req.body.quality) || 80;
     const optimizedPath = await compressImage(filePath, mimeType, req.file.originalname, quality);
+
+    const originalSize = fs.statSync(filePath).size;
+    const optimizedSize = fs.statSync(optimizedPath).size;
+    const sizeReduction = (((originalSize - optimizedSize) / originalSize) * 100).toFixed(2);
     
     fs.unlinkSync(filePath);
 
+    const fileBuffer = fs.readFileSync(optimizedPath);
+    const cid = await addFileToIPFS(fileBuffer)
+
     const baseUrl = `${req.protocol}://${req.get('host')}`;
-    res.json({ 
-      url: `/optimized/${path.basename(optimizedPath)}`,
-      fullUrl: `${baseUrl}/optimized/${path.basename(optimizedPath)}`
+    const optimizedUrl = `${baseUrl}/optimized/${path.basename(optimizedPath)}`;
+
+    res.json({
+      optimized_url: optimizedUrl,
+      ipfs_cid: cid.toString(),
+      size_reduction: `${sizeReduction}%`,
     });
 
   } catch (err) {
@@ -79,18 +90,25 @@ router.post("/url", async (req, res) => {
       filename = `image-${Date.now()}.${ext}`;
     }
     
+    const originalSize = fs.statSync(tempPath).size;
     const optimizedPath = await compressImage(tempPath, mimeType, filename, parseInt(quality));
+    const optimizedSize = fs.statSync(optimizedPath).size;
+    const sizeReduction = (((originalSize - optimizedSize) / originalSize) * 100).toFixed(2) + "%";
+
     
     // Clean up the temporary downloaded file
     fs.unlinkSync(tempPath);
-    
-    // Get full URL including base
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
+
+    const cid = await addFileToIPFS(optimizedPath);
+
+    const baseUrl = `${req.protocol}://${req.get("host")}`;
+    const optimizedUrl = `${baseUrl}/optimized/${path.basename(optimizedPath)}`;
     
     // Return the static URL
-    res.json({ 
-      url: `/optimized/${path.basename(optimizedPath)}`,
-      fullUrl: `${baseUrl}/optimized/${path.basename(optimizedPath)}`
+    res.json({
+      optimized_url: optimizedUrl,
+      ipfs_cid: cid.toString(),
+      size_reduction: sizeReduction,
     });
   } catch (err) {
     console.error(err);
