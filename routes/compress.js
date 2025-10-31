@@ -44,7 +44,7 @@ router.post("/", upload.single("image"), async (req, res) => {
     res.json({
       optimized_url: optimizedUrl,
       ipfs_cid: cid.toString(),
-      size_reduction: `${sizeReduction}%`,
+      size_reduction: `${Math.abs(sizeReduction)}%`,
     });
 
   } catch (err) {
@@ -93,7 +93,7 @@ router.post("/url", async (req, res) => {
     const originalSize = fs.statSync(tempPath).size;
     const optimizedPath = await compressImage(tempPath, mimeType, filename, parseInt(quality));
     const optimizedSize = fs.statSync(optimizedPath).size;
-    const sizeReduction = (((originalSize - optimizedSize) / originalSize) * 100).toFixed(2) + "%";
+    const sizeReduction = (((originalSize - optimizedSize) / originalSize) * 100).toFixed(2)
 
     
     // Clean up the temporary downloaded file
@@ -108,7 +108,7 @@ router.post("/url", async (req, res) => {
     res.json({
       optimized_url: optimizedUrl,
       ipfs_cid: cid.toString(),
-      size_reduction: sizeReduction,
+      size_reduction: `${Math.abs(sizeReduction)}%`,
     });
   } catch (err) {
     console.error(err);

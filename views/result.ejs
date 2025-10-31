@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Optimized Result</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex justify-center items-center min-h-screen">
+  <div class="bg-white p-8 rounded-2xl shadow-md w-full max-w-lg text-center">
+    <h1 class="text-2xl font-bold text-gray-800 mb-4">✅ Optimization Complete</h1>
+    <p><strong>Optimized URL:</strong> <a href="<%= data.optimized_url %>" class="text-blue-600 underline" target="_blank"><%= data.optimized_url %></a></p>
+    <p><strong>IPFS CID:</strong> <code><%= data.ipfs_cid %></code></p>
+    <p><strong>Size Reduction:</strong> <%= data.size_reduction %></p>
+    <img src="<%= data.optimized_url %>" alt="Optimized Image" class="mt-4 rounded-lg border w-full" />
+    <a href="/" class="mt-6 inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">Back to Home</a>
+  </div>
+</body>
+</html>
