@@ -43,4 +43,4 @@ app.get("/", (req, res) => res.render("index"));
 app.post("/result", (req, res) => res.render("result", { data: req.body }));
 
 
-app.listen(8080, () => console.log("Image Optimization Node running on port 8080"));
+app.listen(8000, () => console.log("Image Optimization Node running on port 8000"));
